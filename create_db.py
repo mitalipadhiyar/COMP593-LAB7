@@ -11,14 +11,16 @@ import inspect
 import sqlite3
 from datetime import datetime
 from faker import Faker
-from pprint import pprint 
+from pprint import pprint
+
 
 def main():
     global db_path
     db_path = os.path.join(get_script_dir(), 'social_network.db')
     create_people_table()
-    
+
     populate_people_table()
+
 
 def create_people_table():
     """Creates the people table in the database"""
@@ -44,51 +46,47 @@ def create_people_table():
     con.close()
     return
 
+
 def populate_people_table():
     """Populates the people table with 200 fake people"""
+
     con = sqlite3.connect(db_path)
     cur = con.cursor()
 
     add_person_query = """
-       INSERT INTO people
-        (
-          name,
-          email,
-          address,
-          city,
-          province,
-          bio,
-          age,
-          created_at,
-          updated_at
-        )
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-"""
-    
-    new_person = ('Bob Loblaw',
-              'bob.loblaw@whatever.net',
-              '123 Fake St.',
-              'Fakesville',
-              'Fake Edward Island',
-              'Enjoys making funny sounds when talking.',
-               46,
-               datetime.now(),
-               datetime.now()) 
-
+        INSERT INTO people
+            (
+            name,
+            email,
+            address,
+            city,
+            province,
+            bio,
+            age,
+            created_at,
+            updated_at
+            )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+    """
     fake = Faker("en_CA")
-    Faker.seed(0)
     for _ in range(200):
-     name = fake.name()
-     age = fake.random_int(min=1, max=100)
-     print(f'{name} is {age} years old.')  
-    cur.execute(add_person_query, new_person)
-    new_person = cur.fetchall()
-    pprint(new_person)
+        new_person = (fake.name(),
+                    fake.ascii_email(),
+                    fake.street_address(),
+                    fake.city(),
+                    fake.administrative_unit(),
+                    fake.sentence(nb_words=10, variable_nb_words=False),
+                    fake.random_int(min=1, max=100),
+                    datetime.now(),
+                    datetime.now())
+
+        cur.execute(add_person_query, new_person)
     con.commit()
     con.close()
     
-    return   
-        
+
+    return
+
 
 def get_script_dir():
     """Determines the path of the directory in which this script resides
@@ -96,8 +94,10 @@ def get_script_dir():
     Returns:
         str: Full path of the directory in which this script resides
     """
-    script_path = os.path.abspath(inspect.getframeinfo(inspect.currentframe()).filename)
+    script_path = os.path.abspath(
+        inspect.getframeinfo(inspect.currentframe()).filename)
     return os.path.dirname(script_path)
 
+
 if __name__ == '__main__':
-   main()
+    main()

@@ -10,9 +10,10 @@ import os
 import inspect 
 import sqlite3
 from faker import Faker
-from pprint import pprint 
+import pandas as pd
 
 
+ 
 def main():
     global db_path
     script_dir = get_script_dir()
@@ -38,13 +39,13 @@ def get_old_people():
     cur.execute("""
                 SELECT name, age
                 FROM people
-                WHERE age=30
-                 """, )
-    cur.fetchall()
+                WHERE age>=50
+                 """)
+    list_l = cur.fetchall()
     con.commit()
     con.close()
 
-    return get_old_people
+    return list_l
 
 def print_name_and_age(name_and_age_list):
     """Prints name and age of all people in provided list
@@ -52,19 +53,14 @@ def print_name_and_age(name_and_age_list):
     Args:
         name_and_age_list (list): (name, age) of people
     """
-    get_old_people = name_and_age_list
+    for name, age in name_and_age_list:
+    
+       print(f'{name} is {age} years old.') 
+    
+    return 
 
-    fake = Faker("en_CA")
-    Faker.seed(0)
-    for name_and_age_list in range(200):
-     name = fake.name()
-     age = fake.random_int(min=1, max=100)
-     print(f'{name} is {age} years old.') 
 
     
-   
-    
-
 def save_name_and_age_to_csv(name_and_age_list, csv_path):
     """Saves name and age of all people in provided list
 
@@ -72,7 +68,10 @@ def save_name_and_age_to_csv(name_and_age_list, csv_path):
         name_and_age_list (list): (name, age) of people
         csv_path (str): Path of CSV file
     """
-    # TODO: Create function body
+    report_df = pd.DataFrame(name_and_age_list)
+    report_header = ('name', 'age')
+    report_df.to_csv('oldpeople.csv', index=False,header=report_header)
+    
     return
 
 def get_script_dir():
