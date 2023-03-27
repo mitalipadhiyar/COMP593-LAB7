@@ -41,11 +41,11 @@ def get_old_people():
                 FROM people
                 WHERE age>=50
                  """)
-    list_l = cur.fetchall()
+    old_ppl_list = cur.fetchall()
     con.commit()
     con.close()
 
-    return list_l
+    return old_ppl_list
 
 def print_name_and_age(name_and_age_list):
     """Prints name and age of all people in provided list
